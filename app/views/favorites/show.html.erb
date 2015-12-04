@@ -1,0 +1,45 @@
+<div class="page-header">
+  <h3>Favorite #<%= @favorite.id %></h3>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <dl class="dl-horizontal">
+
+      <dt>Name</dt>
+      <dd><%= @favorite.name %></dd>
+
+
+      <dt>Description</dt>
+      <dd><%= @favorite.description %></dd>
+
+
+      <dt>Url</dt>
+      <dd><a href="<%= @favorite.url %>"><%= @favorite.url %></a></dd>
+
+
+      <dt>Rating</dt>
+     <dd>"rating"</dd>
+
+
+      <dt>Category</dt>
+      <dd><%= @favorite.category_id %></dd>
+
+
+    </dl>
+
+    <div class="btn-group btn-group-justified">
+
+      <a href="/favorites" class="btn btn-primary">
+        Back
+      </a>
+      <a href="/favorites/<%= @favorite.id %>/edit" class="btn btn-warning">
+        Edit
+      </a>
+      <a href="/delete_favorite/<%= @favorite.id %>" class="btn btn-danger" rel="nofollow">
+        Delete
+      </a>
+
+    </div>
+  </div>
+</div>
