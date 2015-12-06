@@ -19,11 +19,40 @@
 
 
       <dt>Rating</dt>
-     <dd>"rating"</dd>
+      <% userid=[] %>
+      <% @favorite.fans.each do |user1| %>
+        <% userid.push(user1.id) %>
+      <% end %>
+
+      <% if userid.any? {|a| a==current_user.id} %>
+
+        <dd> <%= @favorite.ratings.find_by({:user_id => current_user.id }).number   %> </dd>
+
+      <% else %>
+
+        <dd>     Not Rated </dd>
+
+      <% end %>
+
+
+     <dt> Peer Rating </dt>
+     <% peerrating=[] %>
+      <% @favorite.ratings.each do |rating1| %>
+        <% if rating1.user_id == current_user.id %>
+        <% else %>
+        <% peerrating.push(rating1.number) %>
+        <% end %>
+      <% end %>
+
+      <% if peerrating.present? %>
+      <dd> <%= peerrating.sum/peerrating.length %> </dd>
+      <% else %>
+      <dd> Not Rated </dd>
+      <% end %>
 
 
       <dt>Category</dt>
-      <dd><%= @favorite.category_id %></dd>
+      <dd><%= @favorite.category.name %></dd>
 
 
     </dl>
@@ -39,6 +68,9 @@
       <a href="/delete_favorite/<%= @favorite.id %>" class="btn btn-danger" rel="nofollow">
         Delete
       </a>
+
+
+
 
     </div>
   </div>

@@ -8,8 +8,10 @@ class User < ActiveRecord::Base
 
   has_many :favorites
   has_many :categories
+  has_many :comments
+  has_many :ratings
 
-  has_many :liked_favorites, :through => :likes, :source => :favorite
+  has_many :rated_favorites, :through => :ratings, :source => :favorite
 
 
 end

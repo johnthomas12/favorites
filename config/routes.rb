@@ -61,10 +61,14 @@ Rails.application.routes.draw do
 
   # READ
   get "/favorites", :controller => "favorites", :action => "index"
+  get "/favorites1", :controller => "favorites", :action => "index1"
+
   get "/favorites/:id", :controller => "favorites", :action => "show"
 
   # UPDATE
   get "/favorites/:id/edit", :controller => "favorites", :action => "edit"
+  get "/favorites/:id/edit1", :controller => "favorites", :action => "edit1"
+
   post "/update_favorite/:id", :controller => "favorites", :action => "update"
 
   # DELETE
