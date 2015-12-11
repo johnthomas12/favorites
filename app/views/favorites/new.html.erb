@@ -7,13 +7,13 @@
     </div>
   <% end %>
 <% end %>
-
+<div class="col-md-8 col-md-offset-2">
 <div class="page-header">
   <h3>Add Favorite</h3>
-</div>
+</div></div>
 
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-8 col-md-offset-2">
 
     <form action="/create_favorite" method="post">
       <!-- Hidden input for authenticity token to protect from forgery -->
@@ -24,12 +24,9 @@
       <!-- Label and input for name -->
 
       <div class="form-group">
-        <label for="name" class="control-label">
-          Name
-        </label>
 
 
-        <input type="text" id="name" name="name" placeholder="Name" class="form-control" value="<%= @favorite.name %>">
+        <input type="hidden" id="name" name="name" placeholder="Name" class="form-control" value="<%= @favorite.id %>">
 
       </div>
 
@@ -38,12 +35,10 @@
       <!-- Label and input for description -->
 
       <div class="form-group">
-        <label for="description" class="control-label">
-          Description
-        </label>
 
 
-        <input type="text" id="description" name="description" placeholder="Description" class="form-control" value="<%= @favorite.description %>">
+
+        <input type="hidden" id="description" name="description" placeholder="Description" class="form-control" value="<%= @favorite.id %>">
 
       </div>
 
@@ -53,7 +48,7 @@
 
       <div class="form-group">
         <label for="url" class="control-label">
-          Url
+          YouTube Url
         </label>
 
 

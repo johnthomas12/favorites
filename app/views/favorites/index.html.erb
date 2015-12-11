@@ -1,37 +1,153 @@
-<div class="page-header">
-  <h1>
-    Favorites
-
-    <a href="/favorites/new" class="btn btn-lg btn-primary">New Favorite</a>
-    <a href="/categories/new" class="btn btn-lg btn-success">New Category</a>
-
-  </h1>
-</div>
+<!-- https://img.youtube.com/vi/#{video.uid}/mqdefault.jpg -->
+<% cookies[:last_viewed] = request.original_url %>
 
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-8 col-md-offset-2">
+    <a href="/favorites/new" class="btn btn-default btn-block">
+      <i class="fa fa-plus">
+      </i>
+    </a>
+    <hr>
+    </div>
+    </div>
+
+      <div>
+
+
+
+      <% if params[:sortvar] == "peer" %>
+
+      <% ratingsL = [] %>
+      <% @favorites.each do |favorite| %>
+      <% ratings1=[] %>
+      <% favorite.ratings.each do |rating| %>
+      <% if rating.user_id == current_user.id %>
+      <% else %>
+      <% ratings1.push(rating.number) %>
+      <% end %>
+      <% end %>
+      <% if ratings1.present? %>
+      <% ratingsL.push({:id => favorite.id,:rating3 => ((ratings1.sum)/(ratings1.length)).to_i}) %>
+      <% else %>
+      <% ratingsL.push({:id => favorite.id,:rating3 => 0 }) %>
+      <% end %>
+      <% end %>
+      <% end %>
+
+      <% if params[:sortvar] == "your" %>
+      <% ratingsL = [] %>
+      <% @favorites.each do |favorite| %>
+      <% ratings1=[] %>
+      <% favorite.ratings.each do |rating| %>
+      <% if rating.user_id == current_user.id %>
+      <% ratings1.push(rating.number) %>
+      <% end %>
+      <% end %>
+      <% ratingsL.push({:id => favorite.id,:rating3 => ratings1}) %>
+      <% end %>
+
+      <% end %>
+
+
+      <% if params[:sortvar] == "num" %>
+      <% ratingsL = [] %>
+      <% @favorites.each do |favorite| %>
+      <% ratings1=[] %>
+      <% favorite.ratings.each do |rating| %>
+      <% ratings1.push(rating.number) %>
+      <% end %>
+      <% ratingsL.push({:id => favorite.id,:rating3 => ratings1.length}) %>
+      <% end %>
+
+      <% end %>
+
+
+
+
+
+
+
+<div class="row">
+  <div class="col-md-8 col-md-offset-2">
     <table class="table table-striped table-hover">
       <tr>
 
-        <th>Name</th>
+      <th> Image </th>
+        <th> <a href="/favorites?sortvar=title" style="color:grey"> Title </a>
+        <% if params[:sortvar]=="title" %>
+        <i class="fa fa-sort-alpha-asc"></i>
+        <% end %>    </th>
 
-        <th>Description</th>
+        <th> <a href="/favorites?sortvar=your" style="color:grey">Your Rating </a> <% if params[:sortvar]=="your" %>
+          <i class="fa fa-arrow-down"></i>
+           <% end %></th>
 
-        <th>User Rating</th>
+        <th> <a href="/favorites?sortvar=peer" style="color:grey">Peer Rating </a> <% if params[:sortvar]=="peer" %>
+          <i class="fa fa-arrow-down"></i>
+           <% end %></th>
 
-        <th> Peer Rating </th>
+        <th> <a href="/favorites?sortvar=num" style="color:grey"># of Ratings </a><% if params[:sortvar]=="num" %>
+          <i class="fa fa-arrow-down"></i>
+           <% end %></th>
 
-        <th>Category</th>
+        <th> <a href="/favorites?sortvar=viewcount" style="color:grey">YouTube Viewcount</a> <% if params[:sortvar]=="viewcount" %>
+          <i class="fa fa-arrow-down"></i>
+           <% end %></th>
 
-        <th>Actions</th>
+        <!-- <th>Actions</th> -->
       </tr>
+      <% zoo = @favorites.order("created_at DESC") %>
 
-      <% @favorites.each do |favorite| %>
+      <% if params[:sortvar] == "your" or params[:sortvar] == "peer" %>
+      <% zoo = ratingsL.sort_by{| rating_hash | rating_hash[:rating3]}.reverse %>
+      <% end %>
+
+
+      <% if params[:sortvar] == "title" %>
+      <% zoo = @favorites.order("name ASC") %>
+      <% end %>
+
+      <% if params[:sortvar] == "num" %>
+      <% zoo = ratingsL.sort_by{| rating_hash | rating_hash[:rating3]}.reverse %>
+      <% end %>
+
+      <% if params[:sortvar] == "viewcount" %>
+      <% zoo = @favorites.order("description ASC") %>
+      <% end %>
+
+
+      <% abcd = [] %>
+      <% @favorites.each do |goose| %>
+      <% zebra = goose.description.gsub(",","") %>
+      <% abcd.push({:id => goose.id,:rating3 => zebra.to_i}) %>
+      <% end %>
+
+
+      <% if params[:sortvar] == "viewcount" %>
+      <% zoo = abcd.sort_by{| rating_hash | rating_hash[:rating3]}.reverse %>
+      <% end %>
+
+
+      <%# if params[:sortvar] == "num" %>
+      <%# zoo = ratingsL.sort_by{| rating_hash | rating_hash[:rating3]}.reverse %>
+      <%# end %>
+
+
+      <% zoo.each do |ordered| %>
+
+
+      <% favorite = Favorite.find_by({:id => ordered[:id]}) %>
+
+      <%# if params[:sortvar] == "title" %>
+      <%# @favorites.order("name DESC").each do |favorite| %>
+      <%# end %>
+
+      <%# @favorites.each do |favorite| %>
       <tr>
+      <td> <a href="/favorites/<%= favorite.id %>"><img src="https://img.youtube.com/vi/<%= youtube_id(favorite.url) %>/mqdefault.jpg" height="90" width="160"> </a></td>
 
-        <td><a href="<%= favorite.url %>"><%= favorite.name %></a></td>
+        <td><a href="/favorites/<%= favorite.id %>"><%= favorite.name %></a></td>
 
-        <td><%= favorite.description %></td>
 
       <% userid=[] %>
       <% favorite.fans.each do |user1| %>
@@ -40,12 +156,24 @@
 
       <% if userid.any? {|a| a==current_user.id} %>
 
-        <td> <%= favorite.ratings.find_by({:user_id => current_user.id }).number   %> </td>
+      <% if favorite.ratings.find_by({:user_id => current_user.id }).number < 5 %>
+
+            <td><a class="btn btn-danger" style="background: darkred"> <%= favorite.ratings.find_by({:user_id => current_user.id }).number   %> </a></td>
+            <% elsif favorite.ratings.find_by({:user_id => current_user.id }).number < 8 %>
+            <td><a class="btn btn-primary"> <%= favorite.ratings.find_by({:user_id => current_user.id }).number   %> </a></td>
+            <% elsif favorite.ratings.find_by({:user_id => current_user.id }).number < 10%>
+            <td><a class="btn btn-success"> <%= favorite.ratings.find_by({:user_id => current_user.id }).number   %> </a></td>
+            <% else %>
+            <td><a class="btn" style="background: gold; color: black"> <%= favorite.ratings.find_by({:user_id => current_user.id }).number   %> </a></td>
+            <% end %>
 
       <% else %>
 
-        <td> Not Rated </td>
-
+      <% if current_user.id == favorite.user_id %>
+    <td><a href="/favorites/<%= favorite.id %>/edit" class="btn btn-default"> Not Rated </a></td>
+      <% else %>
+    <td><a href="/favorites/<%= favorite.id %>/edit1" class="btn btn-default">Not Rated </a></td>
+      <% end %>
       <% end %>
 
       <% peerrating=[] %>
@@ -57,26 +185,38 @@
       <% end %>
 
       <% if peerrating.present? %>
-      <td> <%= peerrating.sum/peerrating.length %> </td>
-      <% else %>
-      <td> Not Rated </td>
-      <% end %>
+      <% if (peerrating.sum.to_f/peerrating.length.to_f).round < 5 %>
+
+            <td><a class="btn btn-danger" style="background: darkred"> <%= (peerrating.sum.to_f/peerrating.length.to_f).round   %> </a></td>
+            <% elsif (peerrating.sum.to_f/peerrating.length.to_f).round < 8 %>
+            <td><a class="btn btn-primary"> <%= (peerrating.sum.to_f/peerrating.length.to_f).round   %> </a></td>
+            <% elsif (peerrating.sum.to_f/peerrating.length.to_f).round < 10%>
+            <td><a class="btn btn-success"> <%= (peerrating.sum.to_f/peerrating.length.to_f).round  %> </a></td>
+            <% else %>
+            <td><a class="btn" style="background: gold; color: black"> <%= (peerrating.sum.to_f/peerrating.length.to_f).round   %> </a></td>
+            <% end %>
+
+          <% else %>
+       <td><a class="btn btn-default"> Not Rated </a></td>
+
+       <% end %>
 
 
-        <td><%= favorite.category.name %></td>
+       <td> <%= userid.length.to_i %> </td>
 
+       <td> <%= favorite.description %></td>
+      <!--
         <td>
 
           <a href="/favorites/<%= favorite.id %>" class="btn btn-primary">Show</a>
           <% if favorite.user_id == current_user.id %>
           <a href="/favorites/<%= favorite.id %>/edit" class="btn btn-warning">Edit</a>
+          <a href="/delete_favorite/<%= favorite.id %>" class="btn btn-danger" rel="nofollow">Delete</a>
           <% else %>
           <a href="/favorites/<%= favorite.id %>/edit1" class="btn btn-warning">Edit</a>
           <% end %>
 
-          <a href="/delete_favorite/<%= favorite.id %>" class="btn btn-danger" rel="nofollow">Delete</a>
-
-        </td>
+        </td> -->
       </tr>
       <% end %>
     </table>

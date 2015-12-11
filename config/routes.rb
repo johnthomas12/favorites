@@ -61,7 +61,7 @@ Rails.application.routes.draw do
 
   # READ
   get "/favorites", :controller => "favorites", :action => "index"
-  get "/favorites1", :controller => "favorites", :action => "index1"
+  get "/timeline", :controller => "favorites", :action => "timeline"
 
   get "/favorites/:id", :controller => "favorites", :action => "show"
 

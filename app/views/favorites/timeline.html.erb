@@ -1,11 +1,8 @@
+<% cookies[:last_viewed] = request.original_url %>
 
-<div class="row">
-<div class="col-md-8 col-md-offset-2">
-<div class="page-header">
-  <h3><%= @category.name %></h3>
-</div>
-</div>
-</div>
+
+
+
 
 <div class="row">
   <div class="col-md-8 col-md-offset-2">
@@ -14,12 +11,11 @@
       </i>
     </a>
     <hr>
-  </div>
-</div>
+    </div>
+    </div>
 
 
-<%= render(@category.favorites.order("created_at DESC")) %>
+<%= render(@favorites.order('created_at DESC')) %>
 
 
 <div class="col-md-8 col-md-offset-2"> <hr> </div>
-

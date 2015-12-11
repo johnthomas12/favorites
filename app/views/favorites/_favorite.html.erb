@@ -1,19 +1,6 @@
 
 <div class="row">
   <div class="col-md-8 col-md-offset-2">
-    <a href="favorites/new" class="btn btn-default btn-block">
-      <i class="fa fa-plus">
-      </i>
-    </a>
-    <hr>
-    </div>
-    </div>
-
-
- <% @favorites.each do |favorite| %>
-
-<div class="row">
-  <div class="col-md-8 col-md-offset-2">
     <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">
@@ -25,35 +12,44 @@
           </small> </h3>
       </div>
 
+    <div class="panel-heading" style="background:#ccffff">
+        <h3 class="panel-title">
+<div><a href="/favorites/<%= favorite.id %>" style="font-size: 20px; color: black"><%= favorite.name %></a></div>
+
+
+      </div>
 
       <div class="panel-body">
 
-        <a href="/favorites/<%= favorite.id %>">
-        <img src="<%= favorite.url %>" class="img-responsive">
-        </a>
+        <div class="video-container"> <iframe width="560" height="315" src="<%= youtube_embed(favorite.url) %>" frameborder="0" allowfullscreen></iframe> </div>
 
-
-<div><a href="<%= favorite.url %>"><%= favorite.name %></a></div>
-
-        <div><%= favorite.description %></div>
 
       <% userid=[] %>
       <% favorite.fans.each do |user1| %>
         <% userid.push(user1.id) %>
       <% end %>
 
-
-
         <div class="btn-group btn-group-justified">
         <% if userid.any? {|a| a==current_user.id} %>
-      <a class="btn btn-primary"> Your Rating: <%= favorite.ratings.find_by({:user_id => current_user.id }).number   %> </a>
 
+      <% if favorite.ratings.find_by({:user_id => current_user.id }).number < 5 %>
 
+            <a class="btn btn-danger" style="background: darkred"> Your Rating: <%= favorite.ratings.find_by({:user_id => current_user.id }).number   %> </a>
+            <% elsif favorite.ratings.find_by({:user_id => current_user.id }).number < 8 %>
+            <a class="btn btn-primary"> Your Rating: <%= favorite.ratings.find_by({:user_id => current_user.id }).number   %> </a>
+            <% elsif favorite.ratings.find_by({:user_id => current_user.id }).number < 10%>
+            <a class="btn btn-success"> Your Rating: <%= favorite.ratings.find_by({:user_id => current_user.id }).number   %> </a>
+            <% else %>
+            <a class="btn" style="background: gold; color: black"> Your Rating: <%= favorite.ratings.find_by({:user_id => current_user.id }).number   %> </a>
+            <% end %>
 
       <% else %>
 
-    <a class="btn btn-primary"> Your Rating: Not Rated </a>
-
+      <% if current_user.id == favorite.user_id %>
+    <a href="/favorites/<%= favorite.id %>/edit" class="btn btn-default"> Your Rating: Not Rated - Click to Rate This Video </a>
+      <% else %>
+    <a href="/favorites/<%= favorite.id %>/edit1" class="btn btn-default"> Your Rating: Not Rated - Click to Rate This Video </a>
+      <% end %>
       <% end %>
 
       <% peerrating=[] %>
@@ -65,17 +61,25 @@
       <% end %>
 
       <% if peerrating.present? %>
-      <a class="btn btn-primary"> Peer Rating: <%= peerrating.sum/peerrating.length %>  </a>
-      <% else %>
-      <a class="btn btn-primary"> Peer Rating: Not Rated </a>
 
-      <% end %>
+            <% if (peerrating.sum.to_f/peerrating.length.to_f).round < 5 %>
+
+            <a class="btn btn-danger" style="background: darkred"> Peer Rating: <%= (peerrating.sum.to_f/peerrating.length.to_f).round   %> </a>
+            <% elsif (peerrating.sum.to_f/peerrating.length.to_f).round < 8 %>
+            <a class="btn btn-primary"> Peer Rating: <%= (peerrating.sum.to_f/peerrating.length.to_f).round   %> </a>
+            <% elsif (peerrating.sum.to_f/peerrating.length.to_f).round < 10%>
+            <a class="btn btn-success"> Peer Rating: <%= (peerrating.sum.to_f/peerrating.length.to_f).round  %> </a>
+            <% else %>
+            <a class="btn" style="background: gold; color: black"> Peer Rating: <%= (peerrating.sum.to_f/peerrating.length.to_f).round   %> </a>
+            <% end %>
+
+          <% else %>
+       <a class="btn btn-default"> Peer Rating: Not Rated </a>
+
+       <% end %>
+
 
       </div>
-
-
-
-
 
 
        <% usernames = [] %>
@@ -83,8 +87,13 @@
         <% usernames.push(ratings.user.username) %>
       <% end %>
 
-      <p></p>
+      <p> </p>
+
+      <% if usernames.present? %>
       <p> <%= usernames.to_sentence %> rated this </p>
+      <% else %>
+      <p> </p>
+      <% end %>
 
         <ul class="media-list">
 
@@ -132,6 +141,7 @@
       </div>
 
     </form>
+
     </div>
     </li>
 </ul>
@@ -144,7 +154,7 @@
       </div>
 
 
-<% end %>
+
 
 
 

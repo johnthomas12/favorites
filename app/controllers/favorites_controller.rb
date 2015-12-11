@@ -1,16 +1,20 @@
 class FavoritesController < ApplicationController
+  require 'open-uri'
+
   def index
     @favorites = Favorite.all
     @comment = Comment.new
   end
 
-  def index1
+
+  def timeline
     @favorites = Favorite.all
     @comment = Comment.new
   end
 
   def show
     @favorite = Favorite.find(params[:id])
+    @comment = Comment.new
   end
 
   def new
@@ -20,9 +24,13 @@ class FavoritesController < ApplicationController
   def create
     @favorite = Favorite.new
 
-    @favorite.name = params[:name]
+    @my_secret = ENV["api_key"]
 
-    @favorite.description = params[:description]
+    @url = "https://www.googleapis.com/youtube/v3/videos?id=#{youtube_id(params[:url])}&key=#{@my_secret}&part=snippet,contentDetails,statistics,status"
+
+    @favorite.name = JSON.parse(open(@url).read)["items"][0]["snippet"]["title"]
+
+    @favorite.description = JSON.parse(open(@url).read)["items"][0]["statistics"]["viewCount"].to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse
 
     @favorite.url = params[:url]
 
@@ -41,9 +49,9 @@ class FavoritesController < ApplicationController
     @rating.favorite_id = @favorite.id
 
     if @rating.save
-      redirect_to "/favorites", :notice => "Favorite created successfully."
+      redirect_to cookies[:last_viewed], :notice => "Favorite created successfully."
     else
-      render 'new'
+      redirect_to "/favorites/#{@favorite.id}/edit", :notice => "Favorite created successfully, need to enter valid rating between 0 and 10."
     end
 
   else
@@ -63,31 +71,37 @@ class FavoritesController < ApplicationController
   def update
     @favorite = Favorite.find(params[:id])
 
-    @favorite.name = params[:name]
+    my_secret = ENV["api_key"]
 
-    @favorite.description = params[:description]
+    @url = "https://www.googleapis.com/youtube/v3/videos?id=#{youtube_id(params[:url])}&key=#{my_secret}&part=snippet,contentDetails,statistics,status"
+
+    @favorite.name = JSON.parse(open(@url).read)["items"][0]["snippet"]["title"]
+
+    @favorite.description = JSON.parse(open(@url).read)["items"][0]["statistics"]["viewCount"].to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse
 
     @favorite.url = params[:url]
 
     @favorite.category_id = params[:category_id]
 
+      if Rating.find_by_user_id_and_favorite_id(current_user.id,params[:id]).present?
+      @rating = Rating.find_by_user_id_and_favorite_id(current_user.id,params[:id])
+      @rating.number = params[:number]
 
-    if Rating.find_by_user_id_and_favorite_id(current_user.id,params[:id]).present?
-    @rating = Rating.find_by_user_id_and_favorite_id(current_user.id,params[:id])
-    @rating.number = params[:number]
-    @rating.save
-    else
-    @rating = Rating.new
-    @rating.number = params[:number]
-    @rating.user_id = params[:user_id]
-    @rating.favorite_id = params[:id]
-    @rating.save
-    end
+      else
+      @rating = Rating.new
+      @rating.number = params[:number]
+      @rating.user_id = params[:user_id]
+      @rating.favorite_id = params[:id]
 
-    if @favorite.save
-      redirect_to "/favorites", :notice => "Favorite updated successfully."
+      end
+
+      @favorite.save
+
+
+    if @rating.save
+      redirect_to cookies[:last_viewed], :notice => "Favorite updated successfully."
     else
-      render 'edit'
+      render 'edit', :notice => "Please enter valid rating between 0 and 10."
     end
 
   end
@@ -101,4 +115,16 @@ class FavoritesController < ApplicationController
     redirect_to "/favorites", :notice => "Favorite deleted."
 
   end
+
+  private
+
+def sort_column
+    Favorite.column_names.include?(params[:sort]) ? params[:sort] : "Name"
+  end
+
+  def sort_direction
+    %w[asc desc].include?(params[:direction]) ? params[:direction] : "asc"
+  end
+
+
 end

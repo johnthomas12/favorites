@@ -8,12 +8,13 @@
   <% end %>
 <% end %>
 
+<div class="col-md-8 col-md-offset-2">
 <div class="page-header">
-  <h3>Edit Favorite #<%= @favorite.id %></h3>
-</div>
+  <h3>Edit: <%= @favorite.name %></h3>
+</div></div>
 
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-8 col-md-offset-2">
 
     <form action="/update_favorite/<%= @favorite.id %>" method="post">
       <!-- Hidden input for authenticity token to protect from forgery -->
@@ -24,12 +25,11 @@
       <!-- Label and input for name -->
 
       <div class="form-group">
-        <label for="name" class="control-label">
-          Name
-        </label>
 
 
-        <input type="text" id="name" name="name" placeholder="Name" class="form-control" value="<%= @favorite.name %>" disabled>
+        <input type="hidden" id="blah" name="blah" placeholder="Name" class="form-control" value="<%= @favorite.name %>" disabled>
+
+        <input type="hidden" id="name" name="name" placeholder="Name" class="form-control" value="<%= @favorite.name %>">
 
       </div>
 
@@ -39,12 +39,12 @@
       <!-- Label and input for description -->
 
       <div class="form-group">
-        <label for="description" class="control-label">
-          Description
-        </label>
 
 
-        <input type="text" id="description" name="description" placeholder="Description" class="form-control" value="<%= @favorite.description %>" disabled>
+
+        <input type="hidden" id="description" name="description" placeholder="Description" class="form-control" value="<%= @favorite.description %>" disabled>
+
+        <input type="hidden" id="description" name="description" placeholder="Description" class="form-control" value="<%= @favorite.description %>">
 
       </div>
 
@@ -53,12 +53,12 @@
       <!-- Label and input for url -->
 
       <div class="form-group">
-        <label for="url" class="control-label">
-          Url
-        </label>
 
 
-        <input type="text" id="url" name="url" placeholder="Url" class="form-control" value="<%= @favorite.url %>" disabled>
+
+        <input type="hidden" id="url1" name="url1" placeholder="Url1" class="form-control" value="<%= @favorite.url %>" disabled>
+
+        <input type="hidden" id="url" name="url" placeholder="Url" class="form-control" value="<%= @favorite.url %>">
 
       </div>
 
@@ -69,7 +69,9 @@
           Category
         </label>
 
-        <input type="text" id="category" name="category" placeholder="Category" class="form-control" value="<%= @favorite.category.name %>" disabled>
+        <input type="text" id="category1" name="category1" placeholder="Category1" class="form-control" value="<%= @favorite.category.name %>" disabled>
+
+        <input type="hidden" id="category_id" name="category_id" placeholder="Category" class="form-control" value="<%= @favorite.category_id %>" >
 
       </div>
 
